@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+        <AssemblyVersion>1.0.2.0</AssemblyVersion>
+        <FileVersion>1.0.2.0</FileVersion>
+        <PackageVersion>1.0.2</PackageVersion>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>ollamafarm</ToolCommandName>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
+        <PackageId>Fynydd.ollamafarm</PackageId>
+        <Authors>Fynydd LLC</Authors>
+        <Company>Fynydd Unlimited, Ltd.</Company>
+        <PackageTags>ASP.NET;AI;ollama;CLI</PackageTags>
+        <Description>
+            Ollama Farm is a CLI tool that intermediates REST API calls to multiple ollama API services. Simply make calls to the Ollama Farm REST API as if it were an ollama REST API and the rest is handled for you.
+
+            Install dotnet 8 or later from [https://dotnet.microsoft.com/en-us/download](https://dotnet.microsoft.com/en-us/download) and then install Ollama Farm with the following command:
+            
+            dotnet tool install --global fynydd.ollamafarm
+        </Description>
+        <Copyright>Copyright (c) Fynydd LLC 2024.</Copyright>
+        <PackageProjectUrl>https://github.com/fynydd/Fynydd.OllamaFarm</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/fynydd/Fynydd.OllamaFarm</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageReleaseNotes>Using singleton HttpClient, added output of request IDs, added output of request completion with timer</PackageReleaseNotes>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageIcon>ollamafarm-icon.png</PackageIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="" />
+        <None Include="..\LICENSE" Pack="true" PackagePath="" />
+        <None Include="..\ollamafarm-icon.png" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+</Project>
