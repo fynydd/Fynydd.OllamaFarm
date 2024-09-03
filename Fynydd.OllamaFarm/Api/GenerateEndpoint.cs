@@ -20,11 +20,10 @@ public static class GenerateEndpoint
 
                 if (string.IsNullOrEmpty(jsonRequest))
                 {
-                    return Results.Json(new
+                    return Results.BadRequest(new
                     {
                         Message = "No JSON payload"
-                        
-                    }, contentType: "application/json", statusCode: (int)HttpStatusCode.BadRequest);
+                    });
                 }
 
                 var farmModel = JsonSerializer.Deserialize<FarmSubmodel>(jsonRequest);
@@ -80,24 +79,21 @@ public static class GenerateEndpoint
                         {
                             Message = "All Ollama hosts are busy"
                         
-                        }, contentType: "application/json", statusCode: (int)HttpStatusCode.TooManyRequests);
+                        }, JsonSerializerOptions.Default, "application/json", (int)HttpStatusCode.TooManyRequests);
                     
                     var _host = stateService.Hosts.FirstOrDefault(h => h.FullAddress.Equals(requestedHost, StringComparison.InvariantCultureIgnoreCase));
 
                     if (_host is null)
-                    {
-                        return Results.Json(new
+                        return Results.BadRequest(new
                         {
                             Message = $"Requested host {requestedHost} does not exist"
-
-                        }, contentType: "application/json", statusCode: (int)HttpStatusCode.TooManyRequests);
-                    }
+                        });
 
                     return Results.Json(new
                     {
                         Message = $"Requested host {requestedHost} is {(_host.IsOffline ? "offline" : "busy")}"
                     
-                    }, contentType: "application/json", statusCode: (int)HttpStatusCode.TooManyRequests);
+                    }, JsonSerializerOptions.Default, "application/json", (int)HttpStatusCode.TooManyRequests);
                 }
 
                 var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(OllamaHost.RequestTimeoutSeconds));
@@ -162,7 +158,7 @@ public static class GenerateEndpoint
                         timer.Stop();
                         ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId}) complete in {(double)timer.ElapsedMilliseconds / 1000:F2}s");
 
-                        return Results.Json(jsonObject, contentType: "application/json", statusCode: (int)httpResponse.StatusCode);
+                        return Results.Json(jsonObject, JsonSerializerOptions.Default, "application/json", (int)httpResponse.StatusCode);
                     }
                 }
                 catch (Exception e)
@@ -173,7 +169,7 @@ public static class GenerateEndpoint
                         {
                             Message = $"The Ollama host request timeout of {OllamaHost.RequestTimeoutSeconds} secs has expired."
                         
-                        }, contentType: "application/json", statusCode: (int)HttpStatusCode.RequestTimeout);
+                        }, JsonSerializerOptions.Default, "application/json", (int)HttpStatusCode.RequestTimeout);
                     }
                     
                     await StateService.ServerAvailableAsync(host);
@@ -185,7 +181,7 @@ public static class GenerateEndpoint
                     {
                         Message = $"{(host.IsOffline ? $"Ollama host {host.Address}:{host.Port} offline; retry in {StateService.RetrySeconds} secs => " : string.Empty)}{e.Message}"
                         
-                    }, contentType: "application/json", statusCode: (int)HttpStatusCode.InternalServerError);
+                    }, JsonSerializerOptions.Default, "application/json", (int)HttpStatusCode.InternalServerError);
                 }
                 finally
                 {
