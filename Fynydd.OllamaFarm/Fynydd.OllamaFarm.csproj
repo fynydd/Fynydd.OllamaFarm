@@ -11,7 +11,7 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>ollamafarm</ToolCommandName>
         <PackageOutputPath>./nupkg</PackageOutputPath>
-        <PackageId>Fynydd.ollamafarm</PackageId>
+        <PackageId>fynydd.ollamafarm</PackageId>
         <Authors>Fynydd LLC</Authors>
         <Company>Fynydd Unlimited, Ltd.</Company>
         <PackageTags>ASP.NET;AI;ollama;CLI</PackageTags>
