@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using Fynydd.OllamaFarm.Models;
-using Fynydd.OllamaFarm.Services;
+using Argentini.OllamaFarm.Models;
+using Argentini.OllamaFarm.Services;
 
-namespace Fynydd.OllamaFarm.Api;
+namespace Argentini.OllamaFarm.Api;
 
 public static class GenerateEndpoint
 {
@@ -142,7 +142,11 @@ public static class GenerateEndpoint
                         }
 
                         timer.Stop();
-                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId}) streamed in {(double)timer.ElapsedMilliseconds / 1000:F2}s");
+
+                        if (stateService.DelayMs > 0)
+                            await Task.Delay(stateService.DelayMs, cancellationTokenSource.Token);
+                        
+                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId}) streamed in {(double)timer.ElapsedMilliseconds / 1000:F2}s{(stateService.DelayMs > 0 ? $" ({stateService.DelayMs}ms delay)" : string.Empty)}");
 
                         return Results.Empty;
                     }
@@ -156,7 +160,11 @@ public static class GenerateEndpoint
                         var jsonObject = JsonSerializer.Deserialize<object>(responseJson);
 
                         timer.Stop();
-                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId}) complete in {(double)timer.ElapsedMilliseconds / 1000:F2}s");
+
+                        if (stateService.DelayMs > 0)
+                            await Task.Delay(stateService.DelayMs, cancellationTokenSource.Token);
+                        
+                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId}) complete in {(double)timer.ElapsedMilliseconds / 1000:F2}s{(stateService.DelayMs > 0 ? $" ({stateService.DelayMs}ms delay)" : string.Empty)}");
 
                         return Results.Json(jsonObject, JsonSerializerOptions.Default, "application/json", (int)httpResponse.StatusCode);
                     }

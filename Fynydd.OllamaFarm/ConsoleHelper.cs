@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Fynydd.OllamaFarm;
+namespace Argentini.OllamaFarm;
 
 public static class ConsoleHelper
 {
@@ -29,12 +29,13 @@ public static class ConsoleHelper
         WriteLine();
         
         WriteLine("Usage:");
-        WriteLine("    ollamafarm [[--port | -p] [port]] [host host host ...]");
+        WriteLine("    ollamafarm [[--port | -p] [port]] [[--delay | -d] [ms]] [host host host ...]");
         
         WriteLine();
         
         WriteLine("Parameters:");
         WriteLine("    [[--port | -p] [port]] : Listen to HTTP port number (defaults to 4444)");
+        WriteLine("    [[--delay | -d] [ms]]  : Delay (in ms) added to requests to throttle performance (defaults to 0)");
         WriteLine("    [host host host ...]   : List of host names with optional ports");
         
         WriteLine();
@@ -42,7 +43,7 @@ public static class ConsoleHelper
         WriteLine("Examples:");
         WriteLine("    ollamafarm localhost 10.0.10.1 10.0.10.3");
         WriteLine("    ollamafarm --port 1234 localhost 10.0.10.1 10.0.10.3");
-        WriteLine("    ollamafarm --port 1234 localhost:11234 10.0.10.1 10.0.10.3");
+        WriteLine("    ollamafarm --port 1234 --delay 1000 localhost:11234 10.0.10.1 10.0.10.3");
 
         WriteLine();
         

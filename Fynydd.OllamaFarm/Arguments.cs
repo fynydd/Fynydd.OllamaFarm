@@ -1,6 +1,6 @@
-using Fynydd.OllamaFarm.Models;
+using Argentini.OllamaFarm.Models;
 
-namespace Fynydd.OllamaFarm;
+namespace Argentini.OllamaFarm;
 
 public static class Arguments
 {
@@ -39,6 +39,41 @@ public static class Arguments
         return DefaultPort;
     }
 
+    public static int GetDelayMs(this string[] args)
+    {
+        const int DefaultDelayMs = 0;
+        
+        for (var i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+            
+            if (string.IsNullOrEmpty(arg))
+                continue;
+
+            if (arg.Equals("--delay", StringComparison.OrdinalIgnoreCase) == false && arg.Equals("-d", StringComparison.OrdinalIgnoreCase) == false)
+                continue;
+
+            if (args.Length <= ++i)
+                return DefaultDelayMs;
+
+            if (long.TryParse(args[i], out var listenPort) == false)
+            {
+                ConsoleHelper.WriteLine($"Error => Specified delay ms {args[i]} is invalid");
+                Environment.Exit(1);
+            }
+
+            else if (listenPort is < 0 or > int.MaxValue)
+            {
+                ConsoleHelper.WriteLine($"Error => Specified delay ms {args[i]} is out of range");
+                Environment.Exit(1);
+            }
+
+            return (int)listenPort;
+        }
+
+        return DefaultDelayMs;
+    }
+
     public static ConcurrentBag<OllamaHost> GetHosts(this string[] args)
     {
         var hosts = new ConcurrentBag<OllamaHost>();
@@ -50,7 +85,7 @@ public static class Arguments
             if (string.IsNullOrEmpty(arg))
                 continue;
 
-            if (arg.Equals("--port", StringComparison.OrdinalIgnoreCase) || arg.Equals("-p", StringComparison.OrdinalIgnoreCase))
+            if (arg.Equals("--port", StringComparison.OrdinalIgnoreCase) || arg.Equals("-p", StringComparison.OrdinalIgnoreCase) || arg.Equals("--delay", StringComparison.OrdinalIgnoreCase) || arg.Equals("-d", StringComparison.OrdinalIgnoreCase))
             {
                 ++i;
                 continue;
