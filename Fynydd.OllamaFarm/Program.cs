@@ -1,6 +1,6 @@
-﻿using Argentini.OllamaFarm;
-using Argentini.OllamaFarm.Api;
-using Argentini.OllamaFarm.Services;
+﻿using Fynydd.OllamaFarm;
+using Fynydd.OllamaFarm.Api;
+using Fynydd.OllamaFarm.Services;
 
 #region Locals
 

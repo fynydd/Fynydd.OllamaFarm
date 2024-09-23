@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Argentini.OllamaFarm;
+namespace Fynydd.OllamaFarm;
 
 public static class ConsoleHelper
 {

@@ -1,7 +1,7 @@
 using System.Net.Sockets;
-using Argentini.OllamaFarm.Models;
+using Fynydd.OllamaFarm.Models;
 
-namespace Argentini.OllamaFarm.Services;
+namespace Fynydd.OllamaFarm.Services;
 
 public sealed class StateService
 {

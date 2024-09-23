@@ -1,6 +1,6 @@
-using Argentini.OllamaFarm.Models;
+using Fynydd.OllamaFarm.Models;
 
-namespace Argentini.OllamaFarm;
+namespace Fynydd.OllamaFarm;
 
 public static class Arguments
 {

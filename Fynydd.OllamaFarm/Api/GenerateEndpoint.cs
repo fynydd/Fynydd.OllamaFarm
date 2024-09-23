@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using Argentini.OllamaFarm.Models;
-using Argentini.OllamaFarm.Services;
+using Fynydd.OllamaFarm.Models;
+using Fynydd.OllamaFarm.Services;
 
-namespace Argentini.OllamaFarm.Api;
+namespace Fynydd.OllamaFarm.Api;
 
 public static class GenerateEndpoint
 {
