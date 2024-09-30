@@ -12,7 +12,7 @@ var _stateService = new StateService();
 
 #if DEBUG
 
-args = ["--delay", "0", "localhost","10.0.10.3"];
+args = ["--delay", "10", "localhost/2", "10.0.10.3/2", "10.0.10.4"];
 
 #endif
 
@@ -36,7 +36,7 @@ foreach (var host in _stateService.Hosts)
 {
     await StateService.ServerAvailableAsync(host);
     
-    ConsoleHelper.WriteLine($"Using Ollama host {host.Address}:{host.Port} ({(host.IsOnline ? "Online" : "Offline")})");
+    ConsoleHelper.WriteLine($"Using Ollama host {host.Address}:{host.Port}/{host.MaxConcurrentRequests} ({(host.IsOnline ? "Online" : "Offline")})");
 
     if (host.IsOffline)
         host.NextPing = DateTime.Now;

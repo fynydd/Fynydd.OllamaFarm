@@ -56,19 +56,19 @@ public static class Arguments
             if (args.Length <= ++i)
                 return DefaultDelayMs;
 
-            if (long.TryParse(args[i], out var listenPort) == false)
+            if (int.TryParse(args[i], out var delayMs) == false)
             {
                 ConsoleHelper.WriteLine($"Error => Specified delay ms {args[i]} is invalid");
                 Environment.Exit(1);
             }
 
-            else if (listenPort is < 0 or > int.MaxValue)
+            else if (delayMs < 0)
             {
                 ConsoleHelper.WriteLine($"Error => Specified delay ms {args[i]} is out of range");
                 Environment.Exit(1);
             }
 
-            return (int)listenPort;
+            return delayMs;
         }
 
         return DefaultDelayMs;
@@ -81,17 +81,31 @@ public static class Arguments
         for (var i = 0; i < args.Length; i++)
         {
             var arg = args[i];
+            var concurrency = 1;
             
             if (string.IsNullOrEmpty(arg))
                 continue;
 
-            if (arg.Equals("--port", StringComparison.OrdinalIgnoreCase) || arg.Equals("-p", StringComparison.OrdinalIgnoreCase) || arg.Equals("--delay", StringComparison.OrdinalIgnoreCase) || arg.Equals("-d", StringComparison.OrdinalIgnoreCase))
+            if (arg.Equals("--port", StringComparison.OrdinalIgnoreCase) || arg.Equals("-p", StringComparison.OrdinalIgnoreCase) || arg.Equals("--delay", StringComparison.OrdinalIgnoreCase) || arg.Equals("-d", StringComparison.OrdinalIgnoreCase) || arg.Equals("--concurrency", StringComparison.OrdinalIgnoreCase) || arg.Equals("-c", StringComparison.OrdinalIgnoreCase))
             {
                 ++i;
                 continue;
             }
+
+            var segments = arg.TrimStart("http://").TrimStart("https://")?.Split('/', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+            if (segments.Length == 2)
+            {
+                arg = arg[..arg.LastIndexOf('/')];
+                
+                if (int.TryParse(segments[1], out concurrency) == false)
+                {
+                    ConsoleHelper.WriteLine($"Error => passed host {arg} specifies an invalid concurrency value");
+                    Environment.Exit(1);
+                }
+            }
             
-            var segments = arg.Split(':', StringSplitOptions.RemoveEmptyEntries);
+            segments = arg.Split(':', StringSplitOptions.RemoveEmptyEntries);
 
             if (segments.Length < 1)
                 continue;
@@ -113,8 +127,10 @@ public static class Arguments
             
             hosts.Add(new OllamaHost
             {
+                Index = hosts.Count,
                 Address = segments[0],
                 Port = port,
+                MaxConcurrentRequests = concurrency,
                 IsOnline = true
             });
         }

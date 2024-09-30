@@ -11,7 +11,9 @@ public sealed class StateService
     public int DelayMs { get; set; }
     public static int RetrySeconds => 30;
     public ConcurrentBag<OllamaHost> Hosts { get; set; } = [];
-    
+    public int HostIndex { get; set; }
+    public Semaphore SingleSemaphore { get; set; } = new (1, 1);
+
     #endregion
     
     #region Methods

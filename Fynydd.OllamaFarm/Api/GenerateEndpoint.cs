@@ -37,12 +37,21 @@ public static class GenerateEndpoint
                 
                 OllamaHost? host = null;
 
-                foreach (var _host in stateService.Hosts)
-                {
-                    if (_host.IsBusy || (_host.IsOffline && _host.NextPing > DateTime.Now))
-                        continue;
+                stateService.SingleSemaphore.WaitOne();
 
-                    _host.IsBusy = true;
+                var hosts = stateService.Hosts.OrderBy(h => h.Index == stateService.HostIndex ? 0 : 1).ThenBy(h => h.Index).ToList();
+
+                stateService.HostIndex++;
+
+                if (stateService.HostIndex > stateService.Hosts.Count - 1)
+                    stateService.HostIndex = 0;
+
+                stateService.SingleSemaphore.Release();
+                
+                foreach (var _host in hosts)
+                {
+                    if (_host.IsNotAvailable || (_host.IsOffline && _host.NextPing > DateTime.Now))
+                        continue;
 
                     var wasOnline = _host.IsOnline;
                     var wasOffline = _host.IsOnline == false;
@@ -52,24 +61,28 @@ public static class GenerateEndpoint
                     
                     if (_host.IsOffline && wasOnline)
                     {
-                        _host.IsBusy = false;
+                        _host.ActiveRequestsCount = 0;
                         ConsoleHelper.WriteLine($"{DateTime.Now:s} => Ollama host {_host.Address}:{_host.Port} offline; retry in {StateService.RetrySeconds} secs");
                     }
 
                     if (_host.IsOnline && wasOffline)
                     {
-                        _host.IsBusy = false;
+                        _host.ActiveRequestsCount = 0;
                         ConsoleHelper.WriteLine($"{DateTime.Now:s} => Ollama host {_host.Address}:{_host.Port} back online");
                     }
 
-                    if (_host.IsOnline && host is null && (string.IsNullOrEmpty(requestedHost) || requestedHost.Equals(_host.FullAddress, StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        host = _host;
-                    }
-                    else
-                    {
-                        _host.IsBusy = false;
-                    }
+                    if (_host.IsOnline == false || host is not null || (string.IsNullOrEmpty(requestedHost) == false && requestedHost.Equals(_host.FullAddress, StringComparison.InvariantCultureIgnoreCase) == false))
+                        continue;
+
+                    if (_host.IsNotAvailable)
+                        continue;
+
+                    _host.ActiveRequestsCount++;
+
+                    if (_host.ActiveRequestsCount > _host.MaxConcurrentRequests)
+                        _host.ActiveRequestsCount = _host.MaxConcurrentRequests;
+
+                    host = _host;
                 }
 
                 if (host is null)
@@ -105,7 +118,7 @@ public static class GenerateEndpoint
                     
                     timer.Start();
                     
-                    ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId})");
+                    ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port}/{host.ActiveRequestsCount} (#{requestId})");
                     
                     var completion = farmModel?.stream ?? false
                         ? HttpCompletionOption.ResponseHeadersRead
@@ -146,7 +159,7 @@ public static class GenerateEndpoint
                         if (stateService.DelayMs > 0)
                             await Task.Delay(stateService.DelayMs, cancellationTokenSource.Token);
                         
-                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId}) streamed in {(double)timer.ElapsedMilliseconds / 1000:F2}s{(stateService.DelayMs > 0 ? $" ({stateService.DelayMs}ms delay)" : string.Empty)}");
+                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port}/{host.ActiveRequestsCount} (#{requestId}) streamed in {(double)timer.ElapsedMilliseconds / 1000:F2}s{(stateService.DelayMs > 0 ? $" ({stateService.DelayMs}ms delay)" : string.Empty)}");
 
                         return Results.Empty;
                     }
@@ -164,7 +177,7 @@ public static class GenerateEndpoint
                         if (stateService.DelayMs > 0)
                             await Task.Delay(stateService.DelayMs, cancellationTokenSource.Token);
                         
-                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port} (#{requestId}) complete in {(double)timer.ElapsedMilliseconds / 1000:F2}s{(stateService.DelayMs > 0 ? $" ({stateService.DelayMs}ms delay)" : string.Empty)}");
+                        ConsoleHelper.WriteLine($"{DateTime.Now:s} => Request to {host.Address}:{host.Port}/{host.ActiveRequestsCount} (#{requestId}) complete in {(double)timer.ElapsedMilliseconds / 1000:F2}s{(stateService.DelayMs > 0 ? $" ({stateService.DelayMs}ms delay)" : string.Empty)}");
 
                         return Results.Json(jsonObject, JsonSerializerOptions.Default, "application/json", (int)httpResponse.StatusCode);
                     }
@@ -193,7 +206,10 @@ public static class GenerateEndpoint
                 }
                 finally
                 {
-                    host.IsBusy = false;
+                    host.ActiveRequestsCount--;
+
+                    if (host.ActiveRequestsCount < 0)
+                        host.ActiveRequestsCount = 0;
                 }
             });
     }
