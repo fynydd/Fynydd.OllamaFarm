@@ -852,26 +852,11 @@ public static class Strings
 	/// Like: 3d : 5h : 12m : 15s or 3d+5h+12m+15s
 	/// </summary>
 	/// <param name="timespan"></param>
-	/// <param name="delimitter">Text to separate time elements; defaults to " : ".</param>
+	/// <param name="delimiter">Text to separate time elements; defaults to " : ".</param>
 	/// <returns>Formatted timespan</returns>
-	public static string FormatTimer(this TimeSpan timespan, string delimitter = ":")
+	public static string FormatTimer(this TimeSpan timespan, string delimiter = ":")
 	{
-		var seconds = $"{timespan.TotalSeconds:0.00000000000000000}";
-
-		if (timespan.TotalSeconds < 60)
-			return $"{seconds[..(seconds.IndexOf('.') + 4)]}s";
-
-		seconds = $"{timespan.Seconds:00.00000000000000000}";
-		
-		if (timespan is { Days: 0, Hours: 0 })
-			return $"{timespan.Minutes:00}m{delimitter}{seconds[..(seconds.IndexOf('.') + 4)]}s";
-
-		if (timespan.Days == 0)
-		{
-			return $"{timespan.Hours:00}h{delimitter}{timespan.Minutes:00}m{delimitter}{seconds[..(seconds.IndexOf('.') + 4)]}s";
-		}
-
-		return $"{timespan.Days:00}d{delimitter}{timespan.Hours:00}h{delimitter}{timespan.Minutes:00}m{delimitter}{seconds[..(seconds.IndexOf('.') + 4)]}s";
+        return $"{timespan.Minutes:#00}m{delimiter}{timespan.Seconds:00}.{timespan.Milliseconds:000}s";
 	}
 	
 	#endregion

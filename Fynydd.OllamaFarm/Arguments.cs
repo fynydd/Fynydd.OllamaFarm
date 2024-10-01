@@ -41,7 +41,7 @@ public static class Arguments
 
     public static int GetDelayMs(this string[] args)
     {
-        const int DefaultDelayMs = 0;
+        const int DefaultDelayMs = 10;
         
         for (var i = 0; i < args.Length; i++)
         {
@@ -86,13 +86,13 @@ public static class Arguments
             if (string.IsNullOrEmpty(arg))
                 continue;
 
-            if (arg.Equals("--port", StringComparison.OrdinalIgnoreCase) || arg.Equals("-p", StringComparison.OrdinalIgnoreCase) || arg.Equals("--delay", StringComparison.OrdinalIgnoreCase) || arg.Equals("-d", StringComparison.OrdinalIgnoreCase) || arg.Equals("--concurrency", StringComparison.OrdinalIgnoreCase) || arg.Equals("-c", StringComparison.OrdinalIgnoreCase))
+            if (arg.Equals("--port", StringComparison.OrdinalIgnoreCase) || arg.Equals("-p", StringComparison.OrdinalIgnoreCase) || arg.Equals("--delay", StringComparison.OrdinalIgnoreCase) || arg.Equals("-d", StringComparison.OrdinalIgnoreCase))
             {
                 ++i;
                 continue;
             }
 
-            var segments = arg.TrimStart("http://").TrimStart("https://")?.Split('/', StringSplitOptions.RemoveEmptyEntries) ?? [];
+            var segments = arg.TrimStart("http://", StringComparison.OrdinalIgnoreCase).TrimStart("https://", StringComparison.OrdinalIgnoreCase)?.Split('/', StringSplitOptions.RemoveEmptyEntries) ?? [];
 
             if (segments.Length == 2)
             {
@@ -105,7 +105,7 @@ public static class Arguments
                 }
             }
             
-            segments = arg.Split(':', StringSplitOptions.RemoveEmptyEntries);
+            segments = arg.TrimStart("http://", StringComparison.OrdinalIgnoreCase).TrimStart("https://", StringComparison.OrdinalIgnoreCase)?.Split(':', StringSplitOptions.RemoveEmptyEntries) ?? [];
 
             if (segments.Length < 1)
                 continue;
@@ -128,6 +128,7 @@ public static class Arguments
             hosts.Add(new OllamaHost
             {
                 Index = hosts.Count,
+                Protocol = arg.StartsWith("https:", StringComparison.OrdinalIgnoreCase) ? "https://" : "http://",
                 Address = segments[0],
                 Port = port,
                 MaxConcurrentRequests = concurrency,

@@ -22,8 +22,6 @@ public sealed class StateService
     {
         try
         {
-            host.NextPing = DateTime.Now.AddSeconds(RetrySeconds);
-            
             using var tcpClient = new TcpClient();
 
             var cancellationTokenSource = new CancellationTokenSource(OllamaHost.ConnectTimeoutSeconds);
@@ -31,17 +29,15 @@ public sealed class StateService
             await tcpClient.ConnectAsync(host.Address, host.Port, cancellationTokenSource.Token);
 
             host.IsOnline = true;
-            host.NextPing = DateTime.Now.AddSeconds(RetrySeconds);
-
-            return;
         }
         catch
         {
-            // ignored
+            host.IsOnline = false;
         }
-
-        host.IsOnline = false;
-        host.NextPing = DateTime.Now.AddSeconds(RetrySeconds);
+        finally
+        {
+            host.NextPing = DateTime.Now.AddSeconds(RetrySeconds);
+        }
     }
     
     #endregion

@@ -12,7 +12,7 @@ var _stateService = new StateService();
 
 #if DEBUG
 
-args = ["--delay", "10", "localhost/2", "10.0.10.3/2", "10.0.10.4"];
+args = ["localhost/8", "10.0.10.3/8", "10.0.10.4"];
 
 #endif
 

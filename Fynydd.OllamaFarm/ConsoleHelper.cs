@@ -29,23 +29,21 @@ public static class ConsoleHelper
         WriteLine();
         
         WriteLine("Usage:");
-        WriteLine("    ollamafarm [[--port | -p] [port]] [[--delay | -d] [ms]] [[--concurrency | -c] [#]] [host[:#][/#] host[:#][/#] host[:#][/#] ...]");
+        WriteLine("    ollamafarm [[--port | -p] [port]] [[--delay | -d] [ms]] [host[:#][/#] ...]");
         
         WriteLine();
         
         WriteLine("Parameters:");
-        WriteLine("    [[--port | -p] [port]]          : Listen to HTTP port number (defaults to 4444)");
-        WriteLine("    [[--delay | -d] [ms]]           : Delay (in ms) added to requests to throttle performance (defaults to 0)");
-        WriteLine("    [[--concurrency | -c] [#]]      : Number of concurrent requests per host (defaults to 1)");
-        WriteLine("    [host[:#][/#] host[:#][/#] ...] : List of host names with optional ports and max concurrent requests");
+        WriteLine("    [[--port | -p] [port]] : Listen to HTTP port (default 4444)");
+        WriteLine("    [[--delay | -d] [ms]]  : Delay (ms) added to requests (default 10)");
+        WriteLine("    [host[:#][/#] ...]     : List of hosts w/port and max concurrent requests");
         
         WriteLine();
         
         WriteLine("Examples:");
-        WriteLine("    ollamafarm localhost 10.0.10.1 10.0.10.3");
-        WriteLine("    ollamafarm --port 1234 localhost 10.0.10.1/2 10.0.10.3/2");
-        WriteLine("    ollamafarm --port 1234 --delay 1000 localhost:11234 10.0.10.1 10.0.10.3");
-        WriteLine("    ollamafarm --port 1234 --delay 100 --concurrency 8 localhost:11234/2 10.0.10.1/2 10.0.10.3");
+        WriteLine("    ollamafarm localhost 10.0.10.1");
+        WriteLine("    ollamafarm --port 1234 localhost 10.0.10.1");
+        WriteLine("    ollamafarm --port 1234 --delay 100 localhost:11234/2 https://10.0.10.1");
 
         WriteLine();
         
